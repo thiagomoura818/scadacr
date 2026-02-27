@@ -82,9 +82,44 @@ public class ModbusClientService {
         }
     }
 
+    public ArrayList<Integer> readHoldingRegisters(int address, int quantity, int unitId) throws ModbusCommunicationException {
+        ArrayList<Integer> responseRegisters = new ArrayList<Integer>();
+
+        try{
+            ReadHoldingRegistersResponse response = client.readHoldingRegisters(unitId, new ReadHoldingRegistersRequest(address, quantity));
+            byte[] bytes = response.registers();
+            for(int i = 0; i < bytes.length; i+=2){
+                int value = getValueFromByte(bytes[i], bytes[i+1]);
+                responseRegisters.add(value);
+            }
+        }catch(ModbusExecutionException | ModbusResponseException | ModbusTimeoutException e){
+            throw new ModbusCommunicationException("Falha ao ler holding registers", e);
+        }
+
+        return responseRegisters;
+    }
+
+    public ArrayList<Integer> readInputRegisters(int address, int quantity, int unitId) throws ModbusCommunicationException {
+        ArrayList<Integer> responseRegisters = new ArrayList<Integer>();
+
+        try{
+            ReadInputRegistersResponse response = client.readInputRegisters(unitId, new ReadInputRegistersRequest(address, quantity));
+            byte[] bytes = response.registers();
+            for(int i = 0; i < bytes.length; i+=2){
+                int value = getValueFromByte(bytes[i], bytes[i+1]);
+                responseRegisters.add(value);
+            }
+        }catch(ModbusExecutionException | ModbusResponseException | ModbusTimeoutException e){
+            throw new ModbusCommunicationException("Falha ao ler holding registers", e);
+        }
+
+        return responseRegisters;
+    }
+
 
 
     private boolean getBitFromByte(int pos, byte number){
         return ((number >> pos) & 1) == 1;
     }
+    private int getValueFromByte(byte lbyte, byte hbyte){ return (((hbyte & 0xFF) << 8) | (lbyte & 0xFF));}
 }
