@@ -2,10 +2,10 @@ package infrastructure.modbus.entities.request.read;
 
 import infrastructure.modbus.entities.request.ModbusRequest;
 
-public class ReadCoils extends ModbusRequest {
+public class ReadCoilsDTO extends ModbusRequest {
     private int quantity;
 
-    public ReadCoils(int address, int quantity, int unitId){
+    public ReadCoilsDTO(int address, int quantity, int unitId){
         super(unitId, address);
 
         if(quantity < 1)

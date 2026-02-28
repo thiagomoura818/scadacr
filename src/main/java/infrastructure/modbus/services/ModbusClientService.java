@@ -1,15 +1,18 @@
 package infrastructure.modbus.services;
 
 import com.digitalpetri.modbus.client.ModbusTcpClient;
-import com.digitalpetri.modbus.exceptions.ModbusConnectException;
 import com.digitalpetri.modbus.exceptions.ModbusExecutionException;
 import com.digitalpetri.modbus.exceptions.ModbusResponseException;
 import com.digitalpetri.modbus.exceptions.ModbusTimeoutException;
 import com.digitalpetri.modbus.pdu.*;
 import com.digitalpetri.modbus.tcp.client.NettyTcpClientTransport;
+import infrastructure.modbus.entities.request.read.ReadCoilsDTO;
+import infrastructure.modbus.entities.request.read.ReadHoldingRegistersDTO;
+import infrastructure.modbus.entities.request.read.ReadInputRegistersDTO;
+import infrastructure.modbus.entities.request.write.WriteSingleCoilDTO;
+import infrastructure.modbus.entities.request.write.WriteSingleRegisterDTO;
 import infrastructure.modbus.exceptions.ModbusCommunicationException;
 
-import java.time.Duration;
 import java.util.ArrayList;
 
 public class ModbusClientService {
@@ -50,14 +53,14 @@ public class ModbusClientService {
         return client.isConnected();
     }
 
-    public ArrayList<Boolean> readCoils(int address, int quantity, int unitId) throws ModbusCommunicationException {
+    public ArrayList<Boolean> readCoils(ReadCoilsDTO readCoilsDTO) throws ModbusCommunicationException {
         ArrayList<Boolean> responseBits = new ArrayList<>();
 
         try{
-            ReadCoilsResponse response = client.readCoils(unitId, new ReadCoilsRequest(address, quantity));
+            ReadCoilsResponse response = client.readCoils(readCoilsDTO.getUnitId(), new ReadCoilsRequest(readCoilsDTO.getAddress(), readCoilsDTO.getQuantity()));
             byte[] coils = response.coils();
 
-            for(int i = 0; i < quantity; i++){
+            for(int i = 0; i < readCoilsDTO.getQuantity(); i++){
                 responseBits.add(i, getBitFromByte(i%8, coils[i/8]));
             }
         }catch(ModbusExecutionException | ModbusResponseException | ModbusTimeoutException e){
@@ -67,27 +70,27 @@ public class ModbusClientService {
         return responseBits;
     }
 
-    public void writeSingleCoil(int address, int value, int unitId) throws ModbusCommunicationException {
+    public void writeSingleCoil(WriteSingleCoilDTO writeSingleCoilDTO) throws ModbusCommunicationException {
         try{
-            WriteSingleCoilResponse response = client.writeSingleCoil(unitId, new WriteSingleCoilRequest(address, value));
+            WriteSingleCoilResponse response = client.writeSingleCoil(writeSingleCoilDTO.getUnitId(), new WriteSingleCoilRequest(writeSingleCoilDTO.getAddress(), writeSingleCoilDTO.getValue()));
         }catch(ModbusExecutionException | ModbusResponseException | ModbusTimeoutException e){
             throw new ModbusCommunicationException("Falha ao escrever um coil. ",e);
         }
     }
 
-    public void writeSingleRegister(int address, int value, int unitId) throws ModbusCommunicationException {
+    public void writeSingleRegister(WriteSingleRegisterDTO writeSingleRegDTO) throws ModbusCommunicationException {
         try{
-            WriteSingleRegisterResponse response = client.writeSingleRegister(unitId, new WriteSingleRegisterRequest(address, value));
+            WriteSingleRegisterResponse response = client.writeSingleRegister(writeSingleRegDTO.getUnitId(), new WriteSingleRegisterRequest(writeSingleRegDTO.getAddress(), writeSingleRegDTO.getValue()));
         }catch(ModbusExecutionException | ModbusResponseException | ModbusTimeoutException e){
             throw new ModbusCommunicationException("Falha ao escrever um coil. ",e);
         }
     }
 
-    public ArrayList<Integer> readHoldingRegisters(int address, int quantity, int unitId) throws ModbusCommunicationException {
+    public ArrayList<Integer> readHoldingRegisters(ReadHoldingRegistersDTO readHoldRegDTO) throws ModbusCommunicationException {
         ArrayList<Integer> responseRegisters = new ArrayList<Integer>();
 
         try{
-            ReadHoldingRegistersResponse response = client.readHoldingRegisters(unitId, new ReadHoldingRegistersRequest(address, quantity));
+            ReadHoldingRegistersResponse response = client.readHoldingRegisters(readHoldRegDTO.getUnitId(), new ReadHoldingRegistersRequest(readHoldRegDTO.getAddress(), readHoldRegDTO.getQuantity()));
             byte[] bytes = response.registers();
             for(int i = 0; i < bytes.length; i+=2){
                 int value = getValueFromByte(bytes[i], bytes[i+1]);
@@ -100,11 +103,11 @@ public class ModbusClientService {
         return responseRegisters;
     }
 
-    public ArrayList<Integer> readInputRegisters(int address, int quantity, int unitId) throws ModbusCommunicationException {
+    public ArrayList<Integer> readInputRegisters(ReadInputRegistersDTO readInRegDTO) throws ModbusCommunicationException {
         ArrayList<Integer> responseRegisters = new ArrayList<Integer>();
 
         try{
-            ReadInputRegistersResponse response = client.readInputRegisters(unitId, new ReadInputRegistersRequest(address, quantity));
+            ReadInputRegistersResponse response = client.readInputRegisters(readInRegDTO.getUnitId(), new ReadInputRegistersRequest(readInRegDTO.getAddress(), readInRegDTO.getQuantity()));
             byte[] bytes = response.registers();
             for(int i = 0; i < bytes.length; i+=2){
                 int value = getValueFromByte(bytes[i], bytes[i+1]);

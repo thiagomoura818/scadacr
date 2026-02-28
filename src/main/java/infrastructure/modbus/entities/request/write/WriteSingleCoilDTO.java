@@ -2,10 +2,10 @@ package infrastructure.modbus.entities.request.write;
 
 import infrastructure.modbus.entities.request.ModbusRequest;
 
-public class WriteSingleCoil extends ModbusRequest {
+public class WriteSingleCoilDTO extends ModbusRequest {
     private boolean value;
 
-    public WriteSingleCoil(int address, boolean value, int unitId){
+    public WriteSingleCoilDTO(int address, boolean value, int unitId){
         super(unitId, address);
         this.value = value;
     }

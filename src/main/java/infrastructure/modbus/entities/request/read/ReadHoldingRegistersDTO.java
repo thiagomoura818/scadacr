@@ -2,10 +2,10 @@ package infrastructure.modbus.entities.request.read;
 
 import infrastructure.modbus.entities.request.ModbusRequest;
 
-public class ReadHoldingRegisters extends ModbusRequest {
+public class ReadHoldingRegistersDTO extends ModbusRequest {
     private int quantity;
 
-    public ReadHoldingRegisters(int address, int quantity, int unitId){
+    public ReadHoldingRegistersDTO(int address, int quantity, int unitId){
         super(unitId, address);
 
         if(quantity < 1)

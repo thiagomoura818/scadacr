@@ -2,10 +2,10 @@ package infrastructure.modbus.entities.request.read;
 
 import infrastructure.modbus.entities.request.ModbusRequest;
 
-public class ReadInputRegisters extends ModbusRequest {
+public class ReadInputRegistersDTO extends ModbusRequest {
     private int quantity;
 
-    public ReadInputRegisters(int address, int quantity, int unitId){
+    public ReadInputRegistersDTO(int address, int quantity, int unitId){
         super(unitId, address);
         if(quantity < 1)
             throw new IllegalArgumentException("Erro, valores fora do escopo");

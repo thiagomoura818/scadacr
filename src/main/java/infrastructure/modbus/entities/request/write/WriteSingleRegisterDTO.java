@@ -2,10 +2,10 @@ package infrastructure.modbus.entities.request.write;
 
 import infrastructure.modbus.entities.request.ModbusRequest;
 
-public class WriteSingleRegister extends ModbusRequest {
+public class WriteSingleRegisterDTO extends ModbusRequest {
     private int value;
 
-    public WriteSingleRegister(int address, int value, int unitId){
+    public WriteSingleRegisterDTO(int address, int value, int unitId){
         super(unitId, address);
 
         this.value = value;
