@@ -9,6 +9,7 @@ import com.digitalpetri.modbus.pdu.*;
 import com.digitalpetri.modbus.tcp.client.NettyTcpClientTransport;
 import infrastructure.modbus.exceptions.ModbusCommunicationException;
 
+import java.time.Duration;
 import java.util.ArrayList;
 
 public class ModbusClientService {
@@ -49,7 +50,7 @@ public class ModbusClientService {
         return client.isConnected();
     }
 
-    public ArrayList<Boolean> readCoils(Integer address, Integer quantity, Integer unitId) throws ModbusCommunicationException {
+    public ArrayList<Boolean> readCoils(int address, int quantity, int unitId) throws ModbusCommunicationException {
         ArrayList<Boolean> responseBits = new ArrayList<>();
 
         try{
@@ -115,7 +116,6 @@ public class ModbusClientService {
 
         return responseRegisters;
     }
-
 
 
     private boolean getBitFromByte(int pos, byte number){
