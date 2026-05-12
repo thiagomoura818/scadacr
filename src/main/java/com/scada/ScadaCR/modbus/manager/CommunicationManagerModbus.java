@@ -1,27 +1,25 @@
 package com.scada.ScadaCR.modbus.manager;
 
-import com.digitalpetri.modbus.client.ModbusClient;
 import com.scada.ScadaCR.modbus.CommunicationManager;
 import com.scada.ScadaCR.modbus.exceptions.ModbusCommunicationException;
 import com.scada.ScadaCR.modbus.pdu.request.ModbusRequest;
 import com.scada.ScadaCR.modbus.pdu.response.ModbusResponse;
 import com.scada.ScadaCR.modbus.services.ModbusClientService;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-@Component
-public class CommunicationManagerModbus implements CommunicationManager {
+public class CommunicationManagerModbus implements CommunicationManager<ModbusResponse<?>> {
     private String host;
     private Integer port;
     private final ModbusClientService modbusClientService;
     private final List<ModbusRequest> cyclicRequests;
     private final ConcurrentLinkedQueue<ModbusRequest> demandRequests;
-    private final ConcurrentLinkedQueue<ModbusResponse> responses;
+    private final ConcurrentLinkedQueue<ModbusResponse<?>> responses;
+    private boolean state;
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
     public CommunicationManagerModbus(ModbusClientService modbusClientService){
         this.modbusClientService = modbusClientService;
@@ -47,7 +45,7 @@ public class CommunicationManagerModbus implements CommunicationManager {
         return this.modbusClientService.isConnected();
     }
 
-    public ConcurrentLinkedQueue<ModbusResponse> executeCycle() throws ModbusCommunicationException {
+    public List<ModbusResponse<?>> executeCycle() throws ModbusCommunicationException {
         if(!isConnected())
             connect();
         while(!demandRequests.isEmpty()){
@@ -76,12 +74,32 @@ public class CommunicationManagerModbus implements CommunicationManager {
         return demandRequests.poll();
     }
 
-    public ConcurrentLinkedQueue<ModbusResponse> getResponses(){
-        ConcurrentLinkedQueue<ModbusResponse> copyOfResponses = new ConcurrentLinkedQueue<>();
+    public List<ModbusResponse<?>> getResponses(){
+        List<ModbusResponse<?>> copyOfResponses = new ArrayList<>();
         for(int i = 0; i < responses.size(); i++) {
             copyOfResponses.add(responses.poll());
         }
 
         return copyOfResponses;
+    }
+
+    public boolean isActive(){
+        return state;
+    }
+
+    public void disable(){
+        this.state = false;
+    }
+
+    public void activate(){
+        this.state = true;
+    }
+
+    public boolean tryStartCycle(){
+        return running.compareAndSet(false,true);
+    }
+
+    public void finishCycle(){
+        running.set(false);
     }
 }
