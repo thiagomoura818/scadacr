@@ -102,4 +102,8 @@ public class CommunicationManagerModbus implements CommunicationManager<ModbusRe
     public void finishCycle(){
         running.set(false);
     }
+
+    public String getIdentifier() {
+        return host + ":" + port;
+    }
 }
