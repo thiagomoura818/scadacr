@@ -46,4 +46,10 @@ public class ModbusBootstrap {
         CommunicationManagerModbus manager = factory.create(config);
         registry.registerManager(config.getIdentifier(), manager);
     }
+
+    public void registerDevice(ModbusDeviceConfig config) throws ModbusRegistryException {
+        CommunicationManagerModbus manager = factory.create(config);
+        registry.registerManager(config.getIdentifier(), manager);
+    }
+
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public interface CommunicationManager<T> {
-    List<T> executeCycle() throws ModbusCommunicationException;
+    void executeCycle() throws ModbusCommunicationException;
     void connect() throws ModbusCommunicationException;
     void disconnect() throws ModbusCommunicationException;
     boolean isConnected() throws ModbusCommunicationException;

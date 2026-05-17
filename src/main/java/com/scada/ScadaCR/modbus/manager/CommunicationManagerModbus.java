@@ -45,7 +45,7 @@ public class CommunicationManagerModbus implements CommunicationManager<ModbusRe
         return this.modbusClientService.isConnected();
     }
 
-    public List<ModbusResponse<?>> executeCycle() throws ModbusCommunicationException {
+    public void executeCycle() throws ModbusCommunicationException {
         if(!isConnected())
             connect();
         while(!demandRequests.isEmpty()){
@@ -54,8 +54,6 @@ public class CommunicationManagerModbus implements CommunicationManager<ModbusRe
         for(ModbusRequest mR : cyclicRequests){
             responses.add(mR.execute(this.modbusClientService));
         }
-
-        return getResponses();
     }
 
     public void addCyclicRequest(ModbusRequest modbusRequest){
@@ -76,9 +74,10 @@ public class CommunicationManagerModbus implements CommunicationManager<ModbusRe
 
     public List<ModbusResponse<?>> getResponses(){
         List<ModbusResponse<?>> copyOfResponses = new ArrayList<>();
-        for(int i = 0; i < responses.size(); i++) {
-            copyOfResponses.add(responses.poll());
-        }
+        ModbusResponse<?> response;
+
+        while((response = responses.poll()) != null)
+            copyOfResponses.add(response);
 
         return copyOfResponses;
     }
