@@ -1,6 +1,6 @@
 package com.scada.ScadaCR.modbus.exceptions;
 
-public class ModbusCommunicationException extends Throwable{
+public class ModbusCommunicationException extends Exception{
     public ModbusCommunicationException(String message) {
         super(message);
     }
